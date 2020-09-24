@@ -10,6 +10,7 @@ enum BrigeEvent {
     setAttributes = "setAttributes",
     registerMagixEvent = "registerMagixEvent",
     removeMagixEvent = "removeMagixEvent",
+    removeAllMagixEvent = "removeAllMagixEvent",
     onRoomStateChanged = "onRoomStateChanged",
     nextPage = "nextPage",
     prevPage = "prevPage",
@@ -31,13 +32,18 @@ export interface ListenerFn {
 }
 
 export class NetlessIframeSDK {
-    private emitter: any = new EventEmitter2();
-    private magixEmitter: any = new EventEmitter2();
-    private _attributes: object = {};
+    private emitter: EventEmitter2 = new EventEmitter2();
+    private magixEmitter: EventEmitter2 = new EventEmitter2();
+    private _attributes: any = {};
     private _systemState: any = {};
 
     public constructor() {
         window.addEventListener("message", this.messageListener.bind(this));
+        window.addEventListener("unload", () => {
+            this.emitter.removeAllListeners();
+            this.magixEmitter.removeAllListeners();
+            this.postMessage(BrigeEvent.removeAllMagixEvent, true);
+        });
     }
 
     private messageListener(event: MessageEvent): void {
@@ -61,7 +67,7 @@ export class NetlessIframeSDK {
         }
     }
 
-    public get attributes(): object {
+    public get attributes(): any {
         return this._attributes;
     }
 
@@ -98,16 +104,22 @@ export class NetlessIframeSDK {
         this.postMessage(BrigeEvent.MagixEvent, { event, payload });
     }
 
-    public removeMagixEventListener(event: string): void {
-        this.magixEmitter.removeListener(event);
+    public removeMagixEventListener(event: string, listener: ListenerFn): void {
+        this.magixEmitter.removeListener(event, listener);
         this.postMessage(BrigeEvent.removeMagixEvent, event);
     }
 
     public nextPage(): void {
+        if (this.attributes.currentPage >= this.attributes.totalPage) {
+            return;
+        }
         this.postMessage(BrigeEvent.nextPage, true);
     }
 
     public prevPage(): void {
+        if (this.attributes.currentPage <= 1) {
+            return;
+        }
         this.postMessage(BrigeEvent.prevPage, true);
     }
 
