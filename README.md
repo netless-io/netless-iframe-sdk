@@ -21,7 +21,7 @@ yarn add netless-iframe-sdk
 ```typescript
 import { NetlessIframeSDK, Events } from "netless-iframe-sdk"
 
-const netlessIframeSDK = new NetlessIframeSDK()
+const netlessIframeSDK = new NetlessIframeSDK("parentDomain.com") // 当前 iframe 的父级域名
 
 netlessIframeSDK.attributes // attributes 是在所有白板中同步的状态
 netlessIframeSDK.setAttributes({ count: 1 }) // setAttributes 设置状态

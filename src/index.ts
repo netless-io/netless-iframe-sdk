@@ -1,9 +1,6 @@
-import { EventEmitter2 } from "eventemitter2";
-import get from "lodash.get";
+import { EventEmitter2, ListenerFn } from "eventemitter2";
 
-const PARENT_ORIGN = "*";
-
-enum BrigeEvent {
+enum BridgeEvent {
     MagixEvent = "MagixEvent",
     initAttributes = "initAttributes",
     attributesUpdate = "attributesUpdate",
@@ -22,48 +19,46 @@ export enum Events {
     onRoomStateChanged = "onRoomStateChanged",
 }
 
-type BrigeData = {
+type BridgeData = {
     kind: string;
     payload: any;
 };
 
-export interface ListenerFn {
-    (...values: any[]): void;
-}
-
 export class NetlessIframeSDK {
+    public targetOrigin: string = "*";
     private emitter: EventEmitter2 = new EventEmitter2();
     private magixEmitter: EventEmitter2 = new EventEmitter2();
     private _attributes: any = {};
     private _systemState: any = {};
 
-    public constructor() {
+    public constructor(targetOrigin: string) {
+        this.targetOrigin = targetOrigin;
         window.addEventListener("message", this.messageListener.bind(this));
         window.addEventListener("unload", () => {
             this.emitter.removeAllListeners();
             this.magixEmitter.removeAllListeners();
-            this.postMessage(BrigeEvent.removeAllMagixEvent, true);
+            this.postMessage(BridgeEvent.removeAllMagixEvent, true);
         });
     }
 
     private messageListener(event: MessageEvent): void {
-        const data: BrigeData = event.data;
+        const data: BridgeData = event.data;
         switch (data.kind) {
-            case BrigeEvent.initAttributes:
+            case BridgeEvent.initAttributes:
                 this._attributes = Object.assign(this._attributes, data.payload);
-                this.emitter.emit(BrigeEvent.initAttributes, data.payload);
+                this.emitter.emit(BridgeEvent.initAttributes, data.payload);
                 break;
-            case BrigeEvent.attributesUpdate:
+            case BridgeEvent.attributesUpdate:
                 this._attributes = Object.assign(this._attributes, data.payload);
-                this.emitter.emit(BrigeEvent.attributesUpdate, data.payload);
+                this.emitter.emit(BridgeEvent.attributesUpdate, data.payload);
                 break;
-            case BrigeEvent.MagixEvent:
+            case BridgeEvent.MagixEvent:
                 const payload = data.payload;
                 this.magixEmitter.emit(payload.event, payload.payload);
                 break;
-            case BrigeEvent.onRoomStateChanged:
+            case BridgeEvent.onRoomStateChanged:
                 this._systemState = Object.assign(this._systemState, data.payload);
-                this.emitter.emit(BrigeEvent.onRoomStateChanged, data.payload);
+                this.emitter.emit(BridgeEvent.onRoomStateChanged, data.payload);
         }
     }
 
@@ -72,7 +67,7 @@ export class NetlessIframeSDK {
     }
 
     public setAttributes(payload: any): void {
-        this.postMessage(BrigeEvent.setAttributes, payload);
+        this.postMessage(BridgeEvent.setAttributes, payload);
     }
 
     public get systemState(): any {
@@ -80,16 +75,16 @@ export class NetlessIframeSDK {
     }
 
     public get isFollower(): boolean {
-        return get(this._systemState, "broadcastState.mode") === "follower";
+        return this._systemState?.broadcastState?.mode === "follower";
     }
 
     private postMessage(kind: string, payload: any): void {
-        const allowFollwerEvents: string[] = [BrigeEvent.registerMagixEvent, BrigeEvent.removeAllMagixEvent];
+        const allowFollwerEvents: string[] = [BridgeEvent.registerMagixEvent, BridgeEvent.removeAllMagixEvent];
         const isAllowEvent = allowFollwerEvents.find(event => event === kind);
         if (this.isFollower && !isAllowEvent) {
             return;
         }
-        parent.postMessage({ kind, payload }, PARENT_ORIGN);
+        parent.postMessage({ kind, payload }, this.targetOrigin);
     }
 
     public on(event: string, listener: ListenerFn): void {
@@ -98,30 +93,30 @@ export class NetlessIframeSDK {
 
     public addMagixEventListener(event: string, listener: ListenerFn): void {
         this.magixEmitter.on(event, listener);
-        this.postMessage(BrigeEvent.registerMagixEvent, event);
+        this.postMessage(BridgeEvent.registerMagixEvent, event);
     }
 
     public dispatchMagixEvent(event: string, payload: any): void {
-        this.postMessage(BrigeEvent.MagixEvent, { event, payload });
+        this.postMessage(BridgeEvent.MagixEvent, { event, payload });
     }
 
     public removeMagixEventListener(event: string, listener: ListenerFn): void {
         this.magixEmitter.removeListener(event, listener);
-        this.postMessage(BrigeEvent.removeMagixEvent, event);
+        this.postMessage(BridgeEvent.removeMagixEvent, event);
     }
 
     public nextPage(): void {
         if (this.attributes.currentPage >= this.attributes.totalPage) {
             return;
         }
-        this.postMessage(BrigeEvent.nextPage, true);
+        this.postMessage(BridgeEvent.nextPage, true);
     }
 
     public prevPage(): void {
         if (this.attributes.currentPage <= 1) {
             return;
         }
-        this.postMessage(BrigeEvent.prevPage, true);
+        this.postMessage(BridgeEvent.prevPage, true);
     }
 
     public destroy(): void {
