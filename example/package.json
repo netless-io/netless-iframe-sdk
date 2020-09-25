@@ -1,0 +1,22 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "iframe.js",
+  "scripts": {
+    "dev": "parcel iframe.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "less": "^3.12.2",
+    "parcel-bundler": "^1.12.4",
+    "@types/react": "^16.9.49"
+  },
+  "dependencies": {
+    "antd": "^4.6.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
