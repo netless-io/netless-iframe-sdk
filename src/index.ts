@@ -75,7 +75,7 @@ export class NetlessIframeSDK {
         this.postMessage(BrigeEvent.setAttributes, payload);
     }
 
-    public get systemState(): object {
+    public get systemState(): any {
         return this._systemState;
     }
 
@@ -84,8 +84,9 @@ export class NetlessIframeSDK {
     }
 
     private postMessage(kind: string, payload: any): void {
-        const isRegisterEvent = kind === BrigeEvent.registerMagixEvent;
-        if (this.isFollower && !isRegisterEvent) {
+        const allowFollwerEvents: string[] = [BrigeEvent.registerMagixEvent, BrigeEvent.removeAllMagixEvent];
+        const isAllowEvent = allowFollwerEvents.find(event => event === kind);
+        if (this.isFollower && !isAllowEvent) {
             return;
         }
         parent.postMessage({ kind, payload }, PARENT_ORIGN);
