@@ -32,7 +32,8 @@ export class NetlessIframeSDK {
     private _systemState: any = {};
 
     public constructor(targetOrigin: string) {
-        this.targetOrigin = targetOrigin;
+        const url = new URL(targetOrigin);
+        this.targetOrigin = url.origin;
         window.addEventListener("message", this.messageListener.bind(this));
         window.addEventListener("unload", () => {
             this.emitter.removeAllListeners();
