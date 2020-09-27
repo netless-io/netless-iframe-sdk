@@ -19,7 +19,7 @@ export class App extends React.Component<{}, AppState> {
 
     private constructor(props: any) {
         super(props);
-        this.sdk = new NetlessIframeSDK("http://locahost:3000");
+        this.sdk = new NetlessIframeSDK("http://localhost:3000");
     }
 
     public componentDidMount(): void {
