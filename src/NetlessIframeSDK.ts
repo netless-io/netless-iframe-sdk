@@ -5,7 +5,8 @@ enum BridgeEvent {
     Init = "Init",
     AttributesUpdate = "AttributesUpdate",
     SetAttributes = "SetAttributes",
-    MagixEvent = "MagixEvent",
+    DispatchMagixEvent = "DispatchMagixEvent",
+    ReciveMagixEvent = "ReciveMagixEvent",
     RegisterMagixEvent = "RegisterMagixEvent",
     RemoveMagixEvent = "RemoveMagixEvent",
     RemoveAllMagixEvent = "RemoveAllMagixEvent",
@@ -59,9 +60,9 @@ export class NetlessIframeSDK {
                 this.emitter.emit(Events.AttributesUpdate, data.payload);
                 break;
             }
-            case BridgeEvent.MagixEvent: {
+            case BridgeEvent.ReciveMagixEvent: {
                 const payload = data.payload;
-                this.magixEmitter.emit(payload.event, payload.payload);
+                this.magixEmitter.emit(payload.event, payload);
                 break;
             }
             case BridgeEvent.RoomStateChanged: {
@@ -119,7 +120,7 @@ export class NetlessIframeSDK {
     }
 
     public dispatchMagixEvent(event: string, payload: any): void {
-        this.postMessage(BridgeEvent.MagixEvent, { event, payload });
+        this.postMessage(BridgeEvent.DispatchMagixEvent, { event, payload });
     }
 
     public removeMagixEventListener(event: string, listener: ListenerFn): void {
