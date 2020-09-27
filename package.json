@@ -13,7 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eventemitter2": "^6.4.3"
+    "eventemitter2": "^6.4.3",
+    "white-web-sdk": "^2.9.17"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.1.0",

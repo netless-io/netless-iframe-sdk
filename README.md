@@ -19,9 +19,9 @@ yarn add netless-iframe-sdk
 ## 初始化 SDK
 
 ```typescript
-import { NetlessIframeSDK, Events } from "netless-iframe-sdk"
+import { createNetlessIframeSDK, NetlessIframeSDK, Events } from "netless-iframe-sdk"
 
-const netlessIframeSDK = new NetlessIframeSDK("parentDomain.com") // 当前 iframe 的父级域名
+const netlessIframeSDK = await createNetlessIframeSDK("http://localhost:3000") // 当前 iframe 的父级域名
 
 netlessIframeSDK.attributes // attributes 是在所有白板中同步的状态
 netlessIframeSDK.setAttributes({ count: 1 }) // setAttributes 设置状态
@@ -39,15 +39,11 @@ netlessIframeSDK.prevPage() // 翻到上一页
 ## 监听系统事件
 
 ```typescript
-netlessIframeSDK.on(Events.initAttributes, attributes => {
-   // 初始化 attributes
-})
-
-netlessIframeSDK.on(Events.attributesUpdate, attributes => {
+netlessIframeSDK.on(Events.AttributesUpdate, attributes => {
    // attributes 更新
 })
 
-netlessIframeSDK.on(Events.onRoomStateChanged, state => {
+netlessIframeSDK.on(Events.RoomStateChanged, state => {
    // 白板状态更新
 })
 ```
@@ -57,15 +53,15 @@ netlessIframeSDK.on(Events.onRoomStateChanged, state => {
 ## 自定义事件
 
 ```typescript
-netlessIframeSDK.addMagixEventListener("nextPage", payload => {
+netlessIframeSDK.addMagixEventListener("NextPage", payload => {
    // 来自白板的自定义翻页事件
 })
 
-netlessIframeSDK.addMagixEventListener("prevPage", payload => {
+netlessIframeSDK.addMagixEventListener("PrevPage", payload => {
    // 来自白板的自定义翻页事件
 })
 
-netlessIframeSDK.removeMagixEventListener("nextPage", payload => {
+netlessIframeSDK.removeMagixEventListener("NextPage", payload => {
   // 移除翻页事件监听
 })
 ```
