@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography, Button, Layout, Row, Col, Card, Collapse, Input, message } from "antd";
-import { NetlessIframeSDK, Events } from "../dist/index";
+import { createNetlessIframeSDK, NetlessIframeSDK, Events } from "../dist/index";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -19,19 +19,18 @@ export class App extends React.Component<{}, AppState> {
 
     private constructor(props: any) {
         super(props);
-        this.sdk = new NetlessIframeSDK("http://localhost:3000");
     }
 
-    public componentDidMount(): void {
-        this.sdk.on(Events.initAttributes, attr => {
-            this.setState({ attributes: attr, page: attr.currentPage });
-        });
-        this.sdk.on(Events.attributesUpdate, attr => {
+    public async componentDidMount(): Promise<void> {
+        this.sdk = await createNetlessIframeSDK("http://localhost:3000");
+        this.setState({ attributes: this.sdk.attributes, roomState: this.sdk.roomState });
+
+        this.sdk.on(Events.AttributesUpdate, attr => {
             this.setState({ attributes: attr });
         });
 
-        this.sdk.on(Events.onRoomStateChanged, roomState => {
-            this.setState({ roomState: roomState });
+        this.sdk.on(Events.RoomStateChanged, roomState => {
+            this.setState({ roomState: Object.assign(this.state.roomState, roomState) });
         });
         const nextPageListener = () => {
             this.setState({ page: this.state.page + 1 });
@@ -39,8 +38,9 @@ export class App extends React.Component<{}, AppState> {
         const prevPageListener = () => {
             this.setState({ page: this.state.page - 1 });
         };
-        this.sdk.addMagixEventListener("nextPage", nextPageListener);
-        this.sdk.addMagixEventListener("prevPage", prevPageListener);
+        this.sdk.addMagixEventListener("NextPage", nextPageListener);
+        this.sdk.addMagixEventListener("PrevPage", prevPageListener);
+        this.setState({ page: this.sdk.currentPage });
     }
 
     public componentWillUnmount(): void {
