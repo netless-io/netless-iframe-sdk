@@ -50,7 +50,7 @@ export class NetlessIframeSDK {
     }
 
     private messageListener(event: MessageEvent): void {
-        if (typeof event.data === "object" && event.data !== null) {
+        if ((typeof event.data) !== "object" && event.data !== null) {
             console.warn("event data not object");
             return;
         }
