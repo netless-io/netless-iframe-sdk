@@ -13,10 +13,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eventemitter2": "^6.4.3",
+    "eventemitter2": "^6.4.3"
+  },
+  "peerDependencies": {
     "white-web-sdk": "^2.9.17"
   },
   "devDependencies": {
+    "white-web-sdk": "^2.9.17",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
