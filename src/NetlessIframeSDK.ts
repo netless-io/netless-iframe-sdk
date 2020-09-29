@@ -140,7 +140,7 @@ export class NetlessIframeSDK {
     public removeMagixEventListener(event: string, listener: ListenerFn): void {
         const count = this.magixListenerMap.get(event);
         if (count === undefined) {
-            throw new Error(`${event} not listener`);
+            throw new Error(`not listen ${event}`);
         }
         this.magixEmitter.removeListener(event, listener);
         if (count > 1) {
