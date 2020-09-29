@@ -11,12 +11,14 @@ export const createNetlessIframeSDK = (targetOrigin: string): Promise<NetlessIfr
                 const { attributes, roomState } = data.payload;
                 const sdk = new NetlessIframeSDK(targetOrigin, attributes, roomState);
                 window.removeEventListener("message", listener);
+                clearTimeout(timer);
                 resolve(sdk);
             }
-            setTimeout(() => {
-                reject("SDK did not receive init event, initializtion failed.");
-            }, InitTimeout);
         };
+        const timer = setTimeout(() => {
+            window.removeEventListener("message", listener);
+            reject("SDK did not receive init event, initializtion failed.");
+        }, InitTimeout);
         window.addEventListener("message", listener);
     });
 };

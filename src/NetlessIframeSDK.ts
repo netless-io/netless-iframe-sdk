@@ -21,20 +21,20 @@ export enum Events {
 }
 
 type BridgeData = {
-    kind: string;
-    payload: any;
+    readonly kind: BridgeEvent;
+    readonly payload: any;
 };
 
 type Attributes = {[key: string]: any};
-
-const AllowFollwerEvents: string[] = [BridgeEvent.RegisterMagixEvent, BridgeEvent.RemoveAllMagixEvent];
 
 export class NetlessIframeSDK {
     public targetOrigin: string = "*";
     private emitter: EventEmitter2 = new EventEmitter2();
     private magixEmitter: EventEmitter2 = new EventEmitter2();
-    private _attributes: Attributes = {};
+    private _attributes: Attributes;
     private _roomState: RoomState;
+    private magixListenerMap: Map<string, number> = new Map();
+    private didDestory: boolean;
 
     public constructor(targetOrigin: string, attributes: Attributes, roomState: RoomState) {
         const url = new URL(targetOrigin);
@@ -50,13 +50,14 @@ export class NetlessIframeSDK {
     }
 
     private messageListener(event: MessageEvent): void {
-        if (Object.prototype.toString.call(event.data) !== "[object Object]") {
+        if ((typeof event.data) !== "object" && event.data !== null) {
+            console.warn("event data not object");
             return;
         }
         const data: BridgeData = event.data;
         switch (data.kind) {
             case BridgeEvent.AttributesUpdate: {
-                this._attributes = Object.assign(this._attributes, data.payload);
+                this._attributes = data.payload;
                 this.emitter.emit(Events.AttributesUpdate, data.payload);
                 break;
             }
@@ -66,9 +67,12 @@ export class NetlessIframeSDK {
                 break;
             }
             case BridgeEvent.RoomStateChanged: {
-                this._roomState = Object.assign(this._roomState, data.payload);
+                this._roomState = data.payload;
                 this.emitter.emit(Events.RoomStateChanged, data.payload);
                 break;
+            }
+            default: {
+                console.warn(`${data.kind} not allow event.`);
             }
         }
     }
@@ -78,7 +82,16 @@ export class NetlessIframeSDK {
     }
 
     public setAttributes(payload: any): void {
-        this._attributes = Object.assign(this._attributes, payload);
+        const newAttibutes = {...payload};
+        for (const key in payload) {
+            const value = payload[key];
+            if (value === undefined) {
+                delete newAttibutes[key];
+            } else {
+                newAttibutes[key] = value;
+            }
+        }
+        this._attributes = newAttibutes;
         this.postMessage(BridgeEvent.SetAttributes, this.attributes);
     }
 
@@ -98,11 +111,11 @@ export class NetlessIframeSDK {
         return this.currentIndex + 1;
     }
 
-    private postMessage(kind: string, payload: any): void {
-        const isAllowEvent = AllowFollwerEvents.find(event => event === kind);
-        if (this.isFollower && !isAllowEvent) {
-            return;
-        }
+    public get totalPage(): number {
+        return this._roomState.sceneState.scenes.length;
+    }
+
+    private postMessage(kind: BridgeEvent, payload: any): void {
         parent.postMessage({ kind, payload }, this.targetOrigin);
     }
 
@@ -116,7 +129,11 @@ export class NetlessIframeSDK {
 
     public addMagixEventListener(event: string, listener: ListenerFn): void {
         this.magixEmitter.on(event, listener);
-        this.postMessage(BridgeEvent.RegisterMagixEvent, event);
+        const count = this.magixListenerMap.get(event);
+        this.magixListenerMap.set(event, (count || 0) + 1);
+        if (!count) {
+            this.postMessage(BridgeEvent.RegisterMagixEvent, event);
+        }
     }
 
     public dispatchMagixEvent(event: string, payload: any): void {
@@ -124,12 +141,23 @@ export class NetlessIframeSDK {
     }
 
     public removeMagixEventListener(event: string, listener: ListenerFn): void {
+        const count = this.magixListenerMap.get(event);
+        if (!count) {
+            console.warn(`${event} not listener`);
+            return;
+        }
         this.magixEmitter.removeListener(event, listener);
-        this.postMessage(BridgeEvent.RemoveMagixEvent, event);
+        if (count > 1) {
+            this.magixListenerMap.set(event, count - 1);
+        } else if (count === 1) {
+            this.magixListenerMap.delete(event);
+            this.postMessage(BridgeEvent.RemoveMagixEvent, event);
+        }
     }
 
     public nextPage(): void {
-        if (this.currentPage >= this.attributes.totalPage) {
+        if (this.currentPage >= this.totalPage) {
+            console.warn(`currentPage cannot be greater than the ${this.totalPage}`);
             return;
         }
         this.postMessage(BridgeEvent.NextPage, true);
@@ -137,14 +165,20 @@ export class NetlessIframeSDK {
 
     public prevPage(): void {
         if (this.currentPage <= 1) {
+            console.warn("currentPage cannot be less than 1");
             return;
         }
         this.postMessage(BridgeEvent.PrevPage, true);
     }
 
     public destroy(): void {
+        if (this.didDestory) {
+            throw new Error("sdk already destroy");
+        }
         window.removeEventListener("message", this.messageListener);
         this.emitter.removeAllListeners();
         this.magixEmitter.removeAllListeners();
+        this.postMessage(BridgeEvent.RemoveAllMagixEvent, true);
+        this.didDestory = true;
     }
 }
