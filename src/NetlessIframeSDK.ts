@@ -73,6 +73,7 @@ export class NetlessIframeSDK {
             }
             default: {
                 console.warn(`${data.kind} not allow event.`);
+                break;
             }
         }
     }
@@ -82,7 +83,7 @@ export class NetlessIframeSDK {
     }
 
     public setAttributes(payload: any): void {
-        const newAttibutes = {...payload};
+        const newAttibutes = {...this.attributes};
         for (const key in payload) {
             const value = payload[key];
             if (value === undefined) {
@@ -92,15 +93,11 @@ export class NetlessIframeSDK {
             }
         }
         this._attributes = newAttibutes;
-        this.postMessage(BridgeEvent.SetAttributes, this.attributes);
+        this.postMessage(BridgeEvent.SetAttributes, payload);
     }
 
     public get roomState(): RoomState {
         return this._roomState;
-    }
-
-    public get isFollower(): boolean {
-        return this._roomState?.broadcastState?.mode === "follower";
     }
 
     public get currentIndex(): number {
@@ -111,7 +108,7 @@ export class NetlessIframeSDK {
         return this.currentIndex + 1;
     }
 
-    public get totalPage(): number {
+    public get totalPages(): number {
         return this._roomState.sceneState.scenes.length;
     }
 
@@ -131,7 +128,7 @@ export class NetlessIframeSDK {
         this.magixEmitter.on(event, listener);
         const count = this.magixListenerMap.get(event);
         this.magixListenerMap.set(event, (count || 0) + 1);
-        if (!count) {
+        if (count !== undefined) {
             this.postMessage(BridgeEvent.RegisterMagixEvent, event);
         }
     }
@@ -142,9 +139,8 @@ export class NetlessIframeSDK {
 
     public removeMagixEventListener(event: string, listener: ListenerFn): void {
         const count = this.magixListenerMap.get(event);
-        if (!count) {
-            console.warn(`${event} not listener`);
-            return;
+        if (count === undefined) {
+            throw new Error(`not listen ${event}`);
         }
         this.magixEmitter.removeListener(event, listener);
         if (count > 1) {
@@ -156,8 +152,8 @@ export class NetlessIframeSDK {
     }
 
     public nextPage(): void {
-        if (this.currentPage >= this.totalPage) {
-            console.warn(`currentPage cannot be greater than the ${this.totalPage}`);
+        if (this.currentPage >= this.totalPages) {
+            console.warn(`currentPage cannot be greater than the ${this.totalPages}`);
             return;
         }
         this.postMessage(BridgeEvent.NextPage, true);
