@@ -74,3 +74,17 @@ netlessIframeSDK.removeMagixEventListener("NextPage", payload => {
 netlessIframeSDK.destroy() // 移除对 window 的 message 事件监听, 移除所有自定义事件的监听
 ```
 
+## 在特定 `sceneDir` 中显示和隐藏
+如果想要 `iframe` 只在某些特定的目录中显示，可以在 `iframe` 中监听当前的 `sceneState` 的变化
+```typescript
+const h5Dir = "/h5" // 比如只让 iframe 在 h5 这个目录下显示
+netlessIframeSDK.on(Events.RoomStateChanged, state => {
+   if (state.sceneState) {
+       if (!state.sceneState.scenePath.startsWith(h5Dir)) {
+            document.body.style.display = "none" //  iframe 隐藏掉自己
+       } else {
+            document.body.removeAttribute("style")
+       }
+   }
+})
+```
