@@ -848,10 +848,10 @@ videojs-vtt.js@^0.15.2:
   dependencies:
     global "^4.3.1"
 
-white-web-sdk@^2.9.17:
-  version "2.9.17"
-  resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.9.17.tgz#d42312765322186d3a24e6fe68f59d01e8233195"
-  integrity sha512-KsHjV0uym6mBUSeeNbnt/EjHsWN4Uh/8ElnDeK+MirPqHbHWc7/NLzuVkKxntF/YhQ3CfuiCfOM3E80W8M0JyQ==
+white-web-sdk@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.10.0.tgz#a0829f90964746c64a8071a85913ea1f2d2ed11b"
+  integrity sha512-dUmhBFr+0l7hxs3ccR+BOnA06LMme6foGDlt6UCIwj9/Czfs4ObjwQpL/DAV1Qd6lZlNYooCyXxzNuq6pGl+bA==
   dependencies:
     "@netless/canvas-polyfill" "^0.0.3"
     atob "^2.1.0"
