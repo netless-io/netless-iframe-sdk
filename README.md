@@ -10,7 +10,7 @@
 # npm
 npm install netless-iframe-sdk
 
-#yarn
+# yarn
 yarn add netless-iframe-sdk
 ```
 
