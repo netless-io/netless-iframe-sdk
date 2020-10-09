@@ -8,10 +8,10 @@
 
 ```
 # npm
-npm install netless-iframe-sdk
+npm install @netless/iframe-sdk
 
 # yarn
-yarn add netless-iframe-sdk
+yarn add @netless/iframe-sdk
 ```
 
 
@@ -19,7 +19,7 @@ yarn add netless-iframe-sdk
 ## 初始化 SDK
 
 ```typescript
-import { createNetlessIframeSDK, NetlessIframeSDK, Events } from "netless-iframe-sdk"
+import { createNetlessIframeSDK, NetlessIframeSDK, Events } from "@netless/iframe-sdk"
 
 const netlessIframeSDK = await createNetlessIframeSDK("http://localhost:3000") // 当前 iframe 的父级域名
 
