@@ -1,6 +1,6 @@
 {
   "name": "netless-iframe-sdk",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/netless-iframe-sdk.esm.js",
@@ -16,10 +16,10 @@
     "eventemitter2": "^6.4.3"
   },
   "peerDependencies": {
-    "white-web-sdk": "^2.10.0"
+    "white-web-sdk": "^2.10.1"
   },
   "devDependencies": {
-    "white-web-sdk": "^2.10.0",
+    "white-web-sdk": "^2.10.1",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
