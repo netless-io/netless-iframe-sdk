@@ -128,7 +128,7 @@ export class NetlessIframeSDK {
         this.magixEmitter.on(event, listener);
         const count = this.magixListenerMap.get(event);
         this.magixListenerMap.set(event, (count || 0) + 1);
-        if (count !== undefined) {
+        if (count === undefined) {
             this.postMessage(BridgeEvent.RegisterMagixEvent, event);
         }
     }
