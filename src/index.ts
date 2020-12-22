@@ -1,9 +1,11 @@
 import { NetlessIframeSDK } from "./NetlessIframeSDK";
 
 const Init = "Init";
+const SDKCreate = "SDKCreate";
 const InitTimeout = 500;
 
 export const createNetlessIframeSDK = (targetOrigin: string): Promise<NetlessIframeSDK> => {
+    parent.postMessage({ kind: SDKCreate }, targetOrigin);
     return new Promise((resolve, reject) => {
         const listener = (event: MessageEvent) => {
             const data = event.data;
