@@ -1,6 +1,6 @@
 {
   "name": "@netless/iframe-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a sdk for iframe html to use white-web-sdk message",
   "main": "dist/index.js",
   "module": "dist/netless-iframe-sdk.esm.js",
