@@ -152,18 +152,10 @@ export class NetlessIframeSDK {
     }
 
     public nextPage(): void {
-        if (this.currentPage >= this.totalPages) {
-            console.warn(`currentPage cannot be greater than the ${this.totalPages}`);
-            return;
-        }
         this.postMessage(BridgeEvent.NextPage, true);
     }
 
     public prevPage(): void {
-        if (this.currentPage <= 1) {
-            console.warn("currentPage cannot be less than 1");
-            return;
-        }
         this.postMessage(BridgeEvent.PrevPage, true);
     }
 
